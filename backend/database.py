@@ -1,45 +1,59 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
-from pathlib import Path
-from dotenv import load_dotenv
-import pymysql
+import random
+import logging
 
-env_path = Path(__file__).parent / ".env"
-load_dotenv(dotenv_path=env_path)
 
-DB_HOST = os.getenv("DB_HOST", "127.0.0.1")
-DB_PORT = int(os.getenv("DB_PORT", 3306))
-DB_USER = os.getenv("DB_USER", "root")
-DB_PASS = os.getenv("DB_PASS", "")
-DB_NAME = os.getenv("DB_NAME", "movies_db")
+import movie_database
 
-def get_connection():
-    return pymysql.connect(
-        host=DB_HOST,
-        port=DB_PORT,
-        user=DB_USER,
-        password=DB_PASS,
-        db=DB_NAME,
-        cursorclass=pymysql.cursors.DictCursor,
-        autocommit=True,
-        charset="utf8mb4"
-    )
+DB_HOST = os.getenv("DB_HOST")
+DB_USER = os.getenv("DB_USER")
+DB_PASS = os.getenv("DB_PASS")
+DB_NAME = os.getenv("DB_NAME")
 
-def fetch_movies_by_genre(genre: str, limit: int = 3):
-    conn = get_connection()
-    try:
-        with conn.cursor() as cur:
-            cur.execute("SELECT * FROM movies WHERE genre=%s LIMIT %s", (genre, limit))
-            return cur.fetchall()
-    finally:
-        conn.close()
+OFFLINE_MODE = False
 
-def fetch_random_movies(limit: int = 3):
-    conn = get_connection()
-    try:
-        with conn.cursor() as cur:
-            cur.execute("SELECT * FROM movies ORDER BY RAND() LIMIT %s", (limit,))
-            return cur.fetchall()
-    finally:
-        conn.close()
+try:
+    
+    if not (DB_HOST and DB_USER and DB_PASS and DB_NAME):
+        raise EnvironmentError("Database credentials missing; switching to offline mode.")
+
+    
+    from sqlalchemy import create_engine, text
+    from sqlalchemy.orm import sessionmaker
+
+    DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
+    engine = create_engine(DATABASE_URL)
+    SessionLocal = sessionmaker(bind=engine)
+
+    def fetch_movies_by_genre(genre: str, limit: int = 10):
+        with SessionLocal() as session:
+            q = text("SELECT * FROM movies WHERE :genre = ANY(genres) LIMIT :limit")
+            result = session.execute(q, {"genre": genre, "limit": limit})
+            return [dict(row) for row in result]
+
+    def fetch_random_movies(limit: int = 10):
+        with SessionLocal() as session:
+            q = text("SELECT * FROM movies ORDER BY RANDOM() LIMIT :limit")
+            result = session.execute(q, {"limit": limit})
+            return [dict(row) for row in result]
+
+except Exception as e:
+    
+    logging.warning("Running in OFFLINE_MODE: %s", e)
+    OFFLINE_MODE = True
+
+
+    def fetch_movies_by_genre(genre: str, limit: int = 10):
+        if hasattr(movie_database, "fetch_movies_by_genre"):
+            return movie_database.fetch_movies_by_genre(genre, limit)
+        movies = getattr(movie_database, "MOVIES", [])
+        filtered = [m for m in movies if genre.lower() in (g.lower() for g in m.get("genres", []))]
+        return filtered[:limit]
+
+    def fetch_random_movies(limit: int = 10):
+        if hasattr(movie_database, "fetch_random_movies"):
+            return movie_database.fetch_random_movies(limit)
+        movies = getattr(movie_database, "MOVIES", [])
+        return random.sample(movies, min(limit, len(movies)))
