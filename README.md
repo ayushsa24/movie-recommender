@@ -2,6 +2,8 @@
 
 A simple full-stack web application that recommends movies based on user input using the OpenAI API. Users can describe their movie preferences (e.g., "action movies with a strong female lead") and receive 3–5 relevant suggestions. All inputs and recommendations are stored in a local SQLite database.
 
+<img width="1920" height="1080" alt="Screenshot (3)" src="https://github.com/user-attachments/assets/5fa4738e-841d-4867-8de9-95be7d3ebd61" />
+
 ---
 
 ## 📦 Project Structure
