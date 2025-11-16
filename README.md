@@ -18,7 +18,6 @@ movie-recommender/
 
 ## 🚀 Features
 
-- 🔍 **Natural Language Processing**: Accepts natural language movie preferences.
 - 🤖 **AI-Powered Recommendations**: Utilizes OpenAI (ChatGPT) to generate personalized movie suggestions.
 - 💾 **Persistent Storage**: Stores user queries and results in a SQLite database.
 - 💡 **Interactive UI**: Glowing, animated UI with responsive design for an engaging user experience.
