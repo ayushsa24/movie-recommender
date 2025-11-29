@@ -1,0 +1,88 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.env
+
+# --- Added: common Python / backend ignores ---
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+pipenv/
+Pipfile.lock
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage
+htmlcov/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+nosetests.xml
+coverage.xml
+
+# Mypy / pytype caches
+.mypy_cache/
+.pytype/
+
+# Django / Flask / sqlite
+*.sqlite3
+*.db
+instance/
+.webassets-cache
+
+# PyCharm
+.idea/
+
+# VS Code workspace (workspace settings already handled above, keep local workspace files ignored)
+*.code-workspace
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Sensitive or local env files (already present but ensure any backend .env variants are ignored)
+*.env.local
+.env.*
+.env
+
+# --- End additions ---
+.env
+.env
